@@ -1,3 +1,5 @@
 flask
 pytesseract
 gunicorn
+requests
+Flask_Cors
