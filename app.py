@@ -1,50 +1,34 @@
 from flask import Flask, request, jsonify
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image
 import pytesseract
-import os
 import io
 import requests
-import re  # For tokenization
-from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
-if os.name == 'nt': 
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-else:  
-    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+# Make sure tesseract is installed and in the path
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 @app.route('/process-image', methods=['POST'])
 def process_image():
     try:
-        data = request.json
-       
-        # Check if an image file or URL is provided in the request
-        image_url = data.get("image")
+        # Get the image file from the request
+        image_url = request.json.get("image")
+        
+        # If URL provided, fetch the image
         if image_url:
             response = requests.get(image_url)
-            if response.status_code != 200:
-                return jsonify({'error': 'Unable to fetch image from URL'}), 400
             img = Image.open(io.BytesIO(response.content))
-       
-        # Apply image processing
-        img = img.convert('L')  # Convert to grayscale
-        img = img.filter(ImageFilter.MedianFilter())  # Apply median filter
-        enhancer = ImageEnhance.Contrast(img)
-        img = enhancer.enhance(2)  # Enhance contrast
-       
+        else:
+            return jsonify({'error': 'No image URL provided'}), 400
+        
         # Perform OCR
         extracted_text = pytesseract.image_to_string(img)
-       
-        # Tokenize text: Split into words (ignores punctuation and splits on spaces)
-        tokens = re.findall(r'\b\w+\b', extracted_text)
-       
-        return jsonify({'text': extracted_text, 'tokens': tokens}), 200
+
+        return jsonify({'text': extracted_text}), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
