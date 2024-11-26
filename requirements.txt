@@ -1,5 +1,5 @@
-flask
-pytesseract
-gunicorn
-requests
-Flask_Cors
+Flask==2.2.2
+Flask-CORS==3.1.1
+pytesseract==0.3.10
+Pillow==9.2.0
+requests==2.28.2
