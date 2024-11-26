@@ -1,23 +1,13 @@
-FROM python:3.9-slim
+FROM jitesoft/tesseract-ocr:latest
 
-# Install system dependencies, including Tesseract
-RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    libtesseract-dev \
-    && apt-get clean
+# Install Python and other dependencies
+RUN apt-get update && apt-get install -y python3 python3-pip
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements file and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
 COPY . .
 
-# Expose the port your Flask app will run on
-EXPOSE 5000
-
-# Run the application
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]
