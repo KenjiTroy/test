@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from PIL import Image, ImageEnhance, ImageFilter
 import pytesseract
+import os
 import io
 import requests
 import re  # For tokenization
@@ -9,8 +10,10 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Configure Tesseract path if required
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+if os.name == 'nt': 
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:  
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 @app.route('/process-image', methods=['POST'])
 def process_image():

@@ -1,7 +1,7 @@
 # Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
-# Install Tesseract and necessary dependencies
+# Install dependencies and Tesseract OCR
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
@@ -15,11 +15,11 @@ RUN pip install -r /app/requirements.txt
 COPY . /app/
 WORKDIR /app
 
+# Set the environment variable for Tesseract (to point to its installation location)
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/
+
 # Expose the port the app will run on
 EXPOSE 5000
-
-# Set the environment variable for Tesseract
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/
 
 # Run the Flask app
 CMD ["python", "app.py"]
